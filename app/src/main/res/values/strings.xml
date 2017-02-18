@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Studoku</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="notes">Notes:</string>
+    <string name="assignments">Assignments:</string>
+    <string name="manage_lectures">Manage Lectures</string>
+    <string name="add_lecture_button">Add LEcture</string>
+    <string name="lectures">Lectures:</string>
+    <string name="need_review">Need Review</string>
+    <string name="upcoming">Upcoming</string>
+</resources>

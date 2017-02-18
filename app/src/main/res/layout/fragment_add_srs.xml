@@ -1,0 +1,49 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="ebk.studoku.AddSrsFragment">
+
+    <TextView
+        android:id="@+id/add_num_textView"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/add_name_textView"
+        android:gravity="center_horizontal"
+        android:layout_below="@id/add_num_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!--
+    <EditText
+        android:id="@+id/add_date_editView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/add_name_textView"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="31dp" />
+    -->
+
+    <TextView
+        android:id="@+id/add_notes_textView"
+        android:text="@string/notes"
+        android:layout_below="@id/add_name_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <EditText
+        android:id="@+id/add_notes_editText"
+        android:layout_below="@id/add_notes_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/add_assignments_textView"
+        android:layout_below="@id/add_notes_editText"
+        android:text="@string/assignments"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</RelativeLayout>
