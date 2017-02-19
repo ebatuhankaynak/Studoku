@@ -19,7 +19,9 @@ import android.widget.SimpleCursorAdapter;
 
 import ebk.studoku.database.DbConst;
 import ebk.studoku.database.StudokuDatabaseHelper;
+import ebk.studoku.model.Lecture;
 import ebk.studoku.transition.Transition;
+import io.realm.Realm;
 
 public class ManageLecturesFragment extends Fragment {
 
@@ -57,13 +59,17 @@ public class ManageLecturesFragment extends Fragment {
         manageAddActivitiesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String lectureName = manageAddLectureEditText.getText().toString();
+                final String lectureName = manageAddLectureEditText.getText().toString();
                 if (!lectureName.equals("")){
-                    ContentValues lectureValues = new ContentValues();
-                    lectureValues.put("LECTURE", lectureName);
-
-                    db.insert("LECTURELIST", null, lectureValues);
-
+                    Realm realm = Realm.getDefaultInstance();
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            Lecture lecture = realm.createObject(Lecture.class);
+                            lecture.setName(lectureName);
+                        }
+                    });
+                    // TODO: 19.2.2017 UPDATE UI VIA LISTENER 
                     manageAddLectureEditText.setText("");
                     Transition.getInstance().switchFragment(getFragmentManager(), new ManageLecturesFragment());
                 }

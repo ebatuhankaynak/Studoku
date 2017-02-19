@@ -2,16 +2,16 @@ package ebk.studoku;
 
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.widget.Toast;
 
 import ebk.studoku.database.AndroidDatabaseManager;
-import ebk.studoku.database.StudokuDatabaseHelper;
 import ebk.studoku.database.StudokuQuery;
 import ebk.studoku.transition.Transition;
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 public class MainActivity extends AppCompatActivity {
     private SQLiteDatabase db;
@@ -22,12 +22,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        studokuQuery = StudokuQuery.getInstance(this);
-        studokuQuery.init();
+        Realm.init(this);
+        RealmConfiguration config = new RealmConfiguration.Builder().build();
+        Realm.setDefaultConfiguration(config);
 
         Transition.getInstance().switchFragment(getSupportFragmentManager(), new MenuFragment());
     }
 
+    /*
     private float x1,x2;
     static final int MIN_DISTANCE = 50;
     @Override
@@ -55,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onTouchEvent(event);
     }
+    */
 
     public SQLiteDatabase getDb() {
         return db;
