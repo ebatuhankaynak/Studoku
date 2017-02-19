@@ -12,15 +12,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
+import java.sql.Time;
+
+import ebk.studoku.adapters.ScheduleAdapter;
 import ebk.studoku.adapters.TextAdapter;
 import ebk.studoku.database.StudokuDatabaseHelper;
 import ebk.studoku.database.StudokuQuery;
+import ebk.studoku.model.Lecture;
+import ebk.studoku.model.Timeslot;
 import ebk.studoku.transition.Transition;
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 
 /**
@@ -55,8 +63,12 @@ public class ScheduleFragment extends Fragment {
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         GridView gridview = (GridView) view.findViewById(R.id.gridview);
-        final TextAdapter textAdapter = new TextAdapter(getContext());
-        gridview.setAdapter(textAdapter);
+        //final TextAdapter textAdapter = new TextAdapter(getContext());
+        //gridview.setAdapter(textAdapter);
+
+        //final ScheduleAdapter scheduleAdapter = new ScheduleAdapter(getContext(), );
+        final ScheduleAdapter scheduleAdapter = new ScheduleAdapter(getContext());
+        gridview.setAdapter(scheduleAdapter);
 
         // TODO: 8.2.2017 LET USER ENTER ALL HIS/HER ACTIVITIES, THEN PLACE THEM INTO THE SCHEDULE.
         // TODO: 8.2.2017 2)MAKE TIMESLOTS CUSTOMIZEABLE BY CLICKING?
@@ -82,26 +94,39 @@ public class ScheduleFragment extends Fragment {
                 View viewOfList = LayoutInflater.from(getContext()).inflate(R.layout.schedule_dialog,null);
 
                 final ListView scheduleDialogListView = (ListView) viewOfList.findViewById(R.id.scheduleDialogListView);
-                scheduleDialogListView.setAdapter(scheduleAdapter);
+
+                Realm realm = Realm.getDefaultInstance();
+                RealmResults<Lecture> lectureList = realm.where(Lecture.class).findAll();
+
+                scheduleDialogListView.setAdapter(new ArrayAdapter<Lecture>(getContext(), android.R.layout.simple_list_item_1,
+                        lectureList));
 
                 scheduleDialogListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        ContentValues updatedValues = new ContentValues();
-                        String day = getDay(position);
+                        final int day = position % 6;
+                        final int slot = position / 6;
 
-                        Cursor c = (Cursor) scheduleDialogListView.getItemAtPosition(i);
-                        final String lectureDay = c.getString(0);
+                        final Lecture lecture = (Lecture) scheduleDialogListView.getItemAtPosition(i);
 
-                        updatedValues.put(day, lectureDay);
-                        int timeSlot = position / 6;
-                        db.update("SCHEDULE", updatedValues, "_id = ?", new String[] {String.valueOf(timeSlot)});
+                        Realm realm = Realm.getDefaultInstance();
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                Timeslot timeslot = realm.createObject(Timeslot.class);
+                                timeslot.setSlot(slot * day);
+                                lecture.getTimeslots().add(timeslot);
+                            }
+                        });
 
-                        if (timeSlot % 2 == 1){
-                            db.update("SCHEDULE", updatedValues, "_id = ?", new String[] {String.valueOf(timeSlot + 1)});
+                        /*
+                        if (slot % 2 == 1){
+                            db.update("SCHEDULE", updatedValues, "_id = ?", new String[] {String.valueOf(slot + 1)});
                         }else{
-                            db.update("SCHEDULE", updatedValues, "_id = ?", new String[] {String.valueOf(timeSlot - 1)});
+                            db.update("SCHEDULE", updatedValues, "_id = ?", new String[] {String.valueOf(slot - 1)});
                         }
+                        */
+
                         // TODO: 17.2.2017 NO DOUBLE ADD? 
                         builder.dismiss();
                         Transition.getInstance().switchFragment(getFragmentManager(), new ScheduleFragment());

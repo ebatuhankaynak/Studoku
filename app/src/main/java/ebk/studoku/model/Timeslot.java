@@ -8,9 +8,17 @@ import io.realm.RealmObject;
 
 public class Timeslot extends RealmObject {
 
-    public int slot;
+    private int slot;
 
     public Timeslot(){
 
+    }
+
+    public int getSlot() {
+        return slot;
+    }
+
+    public void setSlot(int slot) {
+        this.slot = slot;
     }
 }

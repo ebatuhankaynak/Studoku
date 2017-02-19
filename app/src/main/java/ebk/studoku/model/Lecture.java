@@ -10,10 +10,14 @@ import io.realm.RealmObject;
 public class Lecture extends RealmObject {
 
     private String name;
-    public RealmList<Timeslot> timeslots;
+    private RealmList<Timeslot> timeslots;
 
     public Lecture(){
 
+    }
+
+    public String toString(){
+        return name;
     }
 
     public String getName() {
@@ -22,5 +26,13 @@ public class Lecture extends RealmObject {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public RealmList<Timeslot> getTimeslots() {
+        return timeslots;
+    }
+
+    public void setTimeslots(RealmList<Timeslot> timeslots) {
+        this.timeslots = timeslots;
     }
 }

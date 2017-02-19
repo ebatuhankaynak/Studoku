@@ -12,43 +12,29 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+
+import java.util.ArrayList;
 
 import ebk.studoku.database.DbConst;
 import ebk.studoku.database.StudokuDatabaseHelper;
 import ebk.studoku.model.Lecture;
 import ebk.studoku.transition.Transition;
 import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class ManageLecturesFragment extends Fragment {
-
-    private SQLiteDatabase db;
-    private Cursor cursor;
-
-    private SimpleCursorAdapter lecturesListAdapter;
 
     public ManageLecturesFragment() {
         // Required empty public constructor
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        SQLiteOpenHelper srsDatabaseHelper = new StudokuDatabaseHelper(getContext());
-        db = srsDatabaseHelper.getWritableDatabase();
-
-        cursor = db.query("LECTURELIST", new String[]{"LECTURE", "_id"}, null, null, null,
-                null, null);
-
-        lecturesListAdapter = new SimpleCursorAdapter(inflater.getContext(),
-                android.R.layout.simple_list_item_1,
-                cursor,
-                new String[]{"LECTURE"},
-                new int[]{android.R.id.text1},
-                0);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_manage_lectures, container, false);
     }
 
@@ -69,7 +55,7 @@ public class ManageLecturesFragment extends Fragment {
                             lecture.setName(lectureName);
                         }
                     });
-                    // TODO: 19.2.2017 UPDATE UI VIA LISTENER 
+                    // TODO: 19.2.2017 UPDATE UI VIA LISTENER
                     manageAddLectureEditText.setText("");
                     Transition.getInstance().switchFragment(getFragmentManager(), new ManageLecturesFragment());
                 }
@@ -96,14 +82,14 @@ public class ManageLecturesFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         ContentValues updatedValues = new ContentValues();
                         updatedValues.put("LECTURE", input.getText().toString());
-                        db.update("LECTURELIST", updatedValues, "_id = ?", new String[] {String.valueOf(l)});
+                        //db.update("LECTURELIST", updatedValues, "_id = ?", new String[] {String.valueOf(l)});
                         Transition.getInstance().switchFragment(getFragmentManager(), new ManageLecturesFragment());
                     }
                 });
                 builder.setNeutralButton("Delete", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        db.delete(DbConst.TABLE_LECTURELIST, "_id=?", new String[]{String.valueOf(id)});
+                        //db.delete(DbConst.TABLE_LECTURELIST, "_id=?", new String[]{String.valueOf(id)});
                         // TODO: 11.2.2017 ALSO DELETE FROM SCHEDULE (AND LIST???) 
                         Transition.getInstance().switchFragment(getFragmentManager(), new ManageLecturesFragment());
                     }
@@ -117,6 +103,15 @@ public class ManageLecturesFragment extends Fragment {
                 builder.show();
             }
         });
-        lecturesListView.setAdapter(lecturesListAdapter);
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<Lecture> lectureList = realm.where(Lecture.class).findAll();
+        ArrayList<String> lectureNames = new ArrayList<>();
+        for (Lecture lecture : lectureList){
+            lectureNames.add(lecture.getName());
+        }
+        lecturesListView.setAdapter(new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1,
+                lectureNames));
+
+        //lecturesListView.setAdapter(lecturesListAdapter);
     }
 }
