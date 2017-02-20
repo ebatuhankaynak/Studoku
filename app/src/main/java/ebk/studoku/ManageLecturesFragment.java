@@ -59,8 +59,6 @@ public class ManageLecturesFragment extends Fragment {
                     manageAddLectureEditText.setText("");
                     Transition.getInstance().switchFragment(getFragmentManager(), new ManageLecturesFragment());
                 }
-
-
             }
         });
 
@@ -72,26 +70,35 @@ public class ManageLecturesFragment extends Fragment {
                 builder.setTitle("Edit Lecture");
 
                 final EditText input = new EditText(getContext());
-                Cursor c = (Cursor) lecturesListView.getItemAtPosition(i);
-                input.setText(c.getString(0));
-                final String id = c.getString(1);
+                final Realm realm = Realm.getDefaultInstance();
+                final Lecture lecture = realm.where(Lecture.class).equalTo("name", (String) lecturesListView.getItemAtPosition(i)).findFirst();
+                input.setText(lecture.getName());
                 builder.setView(input);
 
                 builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        ContentValues updatedValues = new ContentValues();
-                        updatedValues.put("LECTURE", input.getText().toString());
-                        //db.update("LECTURELIST", updatedValues, "_id = ?", new String[] {String.valueOf(l)});
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                lecture.setName(input.getText().toString());
+                            }
+                        });
                         Transition.getInstance().switchFragment(getFragmentManager(), new ManageLecturesFragment());
                     }
                 });
                 builder.setNeutralButton("Delete", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        //db.delete(DbConst.TABLE_LECTURELIST, "_id=?", new String[]{String.valueOf(id)});
-                        // TODO: 11.2.2017 ALSO DELETE FROM SCHEDULE (AND LIST???) 
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                lecture.getTimeslots().deleteAllFromRealm();
+                                lecture.deleteFromRealm();
+                            }
+                        });
                         Transition.getInstance().switchFragment(getFragmentManager(), new ManageLecturesFragment());
+                        // TODO: 11.2.2017 ALSO DELETE FROM SCHEDULE (AND LIST???)
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -111,7 +118,5 @@ public class ManageLecturesFragment extends Fragment {
         }
         lecturesListView.setAdapter(new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1,
                 lectureNames));
-
-        //lecturesListView.setAdapter(lecturesListAdapter);
     }
 }

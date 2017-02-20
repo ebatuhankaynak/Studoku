@@ -14,6 +14,11 @@ public class Timeslot extends RealmObject {
 
     }
 
+    @Override
+    public String toString(){
+        return String.valueOf(slot);
+    }
+
     public int getSlot() {
         return slot;
     }

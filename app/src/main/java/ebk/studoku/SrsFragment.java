@@ -21,11 +21,6 @@ import ebk.studoku.adapters.SrsListAdapter;
 import ebk.studoku.transition.Transition;
 
 public class SrsFragment extends Fragment {
-    private Cursor todayCursor;
-    private Cursor upcomingCursor;
-
-    private SrsListAdapter todayListAdapter;
-    private SrsListAdapter upcomingListAdapter;
 
     public SrsFragment() {
 
@@ -68,14 +63,6 @@ public class SrsFragment extends Fragment {
         todayList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                /*
-                ObjectAnimator moveAnim = ObjectAnimator.ofFloat(view, "X", 1000);
-                moveAnim.setDuration(2000);
-                moveAnim.setInterpolator(new BounceInterpolator());
-                moveAnim.start();
-                */
-
-                final SQLiteDatabase db = ((MainActivity)getActivity()).getDb();
                 long id = l;
                 todayCursor = db.query("SRS", new String[] {"SRS", "LEVEL", "_id"}, "_id = ?", new String[] {Integer.toString((int) id)},
                         null, null, null);

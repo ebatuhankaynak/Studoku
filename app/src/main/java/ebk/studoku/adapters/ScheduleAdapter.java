@@ -48,8 +48,8 @@ public class ScheduleAdapter extends BaseAdapter{
                 for (int j = 1; j < 6; j++){
                     if (index != timeslots.size()){
                         int timeToFind = timeslots.get(index).getSlot();
-                        if((i * j) == timeToFind){
-                            Lecture lecture = realm.where(Lecture.class).equalTo("timeslots.slot", (i * j)).findFirst();
+                        if(((6 * i) + j) == timeToFind){
+                            Lecture lecture = realm.where(Lecture.class).equalTo("timeslots.slot", ((6 * i) + j)).findFirst();
                             scheduleList.add(lecture.getName());
                             index++;
                         }else{
@@ -58,12 +58,15 @@ public class ScheduleAdapter extends BaseAdapter{
                     }else{
                         scheduleList.add("");
                     }
-
                 }
             }
         }else{
-            for(int i = 0; i < 40; i++) {
-                scheduleList.add("");
+            for(int i = 1; i < 9; i++) {
+                scheduleList.add("" + i);
+                for (int j = 0; j < 5; j++){
+                    scheduleList.add("");
+
+                }
             }
         }
 
@@ -98,26 +101,3 @@ public class ScheduleAdapter extends BaseAdapter{
         return position;
     }
 }
-
-/*
-public class ScheduleAdapter extends RealmBaseAdapter<Lecture> implements ListAdapter {
-
-    private String[] schedule;
-
-    public ScheduleAdapter(Context context, OrderedRealmCollection<Lecture> realmResults) {
-        super(context, realmResults);
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        TextView text = new TextView(this.context);
-        text.setText(schedule[position]);
-        text.setGravity(Gravity.CENTER);
-        text.setBackgroundColor(Color.parseColor("#fbdcbb"));
-        text.setLayoutParams(new GridView.LayoutParams(165, 220));
-        text.setBackgroundResource(R.drawable.grid_items_border);
-
-        return text;
-    }
-}
-*/

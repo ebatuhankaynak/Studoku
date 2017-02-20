@@ -2,10 +2,8 @@ package ebk.studoku;
 
 
 import android.app.AlertDialog;
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -18,11 +16,7 @@ import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
-import java.sql.Time;
-
 import ebk.studoku.adapters.ScheduleAdapter;
-import ebk.studoku.adapters.TextAdapter;
-import ebk.studoku.database.StudokuDatabaseHelper;
 import ebk.studoku.database.StudokuQuery;
 import ebk.studoku.model.Lecture;
 import ebk.studoku.model.Timeslot;
@@ -63,10 +57,6 @@ public class ScheduleFragment extends Fragment {
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         GridView gridview = (GridView) view.findViewById(R.id.gridview);
-        //final TextAdapter textAdapter = new TextAdapter(getContext());
-        //gridview.setAdapter(textAdapter);
-
-        //final ScheduleAdapter scheduleAdapter = new ScheduleAdapter(getContext(), );
         final ScheduleAdapter scheduleAdapter = new ScheduleAdapter(getContext());
         gridview.setAdapter(scheduleAdapter);
 
@@ -87,8 +77,6 @@ public class ScheduleFragment extends Fragment {
             if (position % 6 == 0){
 
             } else if(!(position % 6 == 0 || position < 6)){
-                //Toast.makeText(getContext(), "" + position, Toast.LENGTH_SHORT).show();
-
                 final AlertDialog builder = new AlertDialog.Builder(getContext()).create();
                 builder.setTitle("LECTURES");
                 View viewOfList = LayoutInflater.from(getContext()).inflate(R.layout.schedule_dialog,null);
@@ -113,9 +101,14 @@ public class ScheduleFragment extends Fragment {
                         realm.executeTransaction(new Realm.Transaction() {
                             @Override
                             public void execute(Realm realm) {
-                                Timeslot timeslot = realm.createObject(Timeslot.class);
-                                timeslot.setSlot(slot * day);
-                                lecture.getTimeslots().add(timeslot);
+                                int grid = (slot * 6) + day;
+                                RealmResults<Timeslot> timeslots = realm.where(Timeslot.class).equalTo("slot", grid).findAll();
+                                if (timeslots.size() == 0){
+                                    Timeslot timeslot = realm.createObject(Timeslot.class);
+                                    timeslot.setSlot(grid);
+                                    lecture.getTimeslots().add(timeslot);
+                                }
+
                             }
                         });
 
