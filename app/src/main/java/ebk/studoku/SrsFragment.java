@@ -1,24 +1,18 @@
 package ebk.studoku;
 
-import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
-import android.content.ContentValues;
-import android.content.DialogInterface;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.BounceInterpolator;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+import ebk.studoku.adapters.PopAdapter;
 import ebk.studoku.adapters.SrsListAdapter;
-import ebk.studoku.transition.Transition;
+import ebk.studoku.model.Srs;
 
 public class SrsFragment extends Fragment {
 
@@ -28,22 +22,6 @@ public class SrsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        todayCursor = ((MainActivity)getActivity()).getDb().query("SRS", new String[]{"_id", "NAME", "DATE", "SRS", "LEVEL", "NOTE"}, "SRS=?",
-                new String[]{"0"}, null, null, "SRS ASC");
-        todayListAdapter = new SrsListAdapter(inflater.getContext(),
-                R.layout.srs_listitem2,
-                todayCursor,
-                new String[]{"NAME", "DATE", "SRS", "LEVEL"},
-                new int[]{R.id.listNameTextView, R.id.listDateTextView, R.id.listSrsTextView},
-                0);
-        upcomingCursor = ((MainActivity)getActivity()).getDb().query("SRS", new String[]{"_id", "NAME", "DATE", "SRS", "LEVEL", "NOTE"}, "SRS!=?",
-                new String[]{"0"}, null, null, "SRS ASC");
-        upcomingListAdapter = new SrsListAdapter(inflater.getContext(),
-                R.layout.srs_listitem2,
-                upcomingCursor,
-                new String[]{"NAME", "DATE", "SRS", "LEVEL"},
-                new int[]{R.id.listNameTextView, R.id.listDateTextView, R.id.listSrsTextView},
-                0);
         return inflater.inflate(R.layout.fragment_srs2, container, false);
     }
 
@@ -55,11 +33,11 @@ public class SrsFragment extends Fragment {
         final ListView upcomingList = (ListView) view.findViewById(R.id.srs_upcomingListView);
 
         todayList.setSelector(android.R.color.transparent);
-        todayList.setAdapter(todayListAdapter);
+        todayList.setAdapter(new SrsListAdapter(getContext(), 0));
 
         upcomingList.setSelector(android.R.color.transparent);
-        upcomingList.setAdapter(upcomingListAdapter);
-
+        upcomingList.setAdapter(new SrsListAdapter(getContext(), 1));
+        /*
         todayList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -97,7 +75,7 @@ public class SrsFragment extends Fragment {
                     }
                 }
             }
-        });
+        });*/
 
         upcomingList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -109,10 +87,10 @@ public class SrsFragment extends Fragment {
                 TextView dateTextView = (TextView) viewOfList.findViewById(R.id.srs_dialog_dateTextView);
                 TextView notesTextView = (TextView) viewOfList.findViewById(R.id.srs_dialog_notesTextView);
 
-                Cursor c = (Cursor) upcomingList.getItemAtPosition(i);
-                nameTextView.setText(c.getString(1));
-                dateTextView.setText(c.getString(2));
-                notesTextView.setText(c.getString(5));
+                Srs srs = (Srs) upcomingList.getItemAtPosition(i);
+                nameTextView.setText(srs.getName());
+                dateTextView.setText(srs.getDate());
+                notesTextView.setText(srs.getNote());
 
                 builder.setView(viewOfList);
                 builder.show();

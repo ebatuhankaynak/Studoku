@@ -24,10 +24,6 @@ import ebk.studoku.transition.Transition;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
 public class ScheduleFragment extends Fragment {
 
     private SQLiteDatabase db;

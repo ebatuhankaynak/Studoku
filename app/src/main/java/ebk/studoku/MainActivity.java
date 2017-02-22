@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import ebk.studoku.database.AndroidDatabaseManager;
 import ebk.studoku.database.StudokuQuery;
+import ebk.studoku.model.Srs;
 import ebk.studoku.model.Timeslot;
 import ebk.studoku.transition.Transition;
 import io.realm.Realm;
@@ -26,9 +27,20 @@ public class MainActivity extends AppCompatActivity {
         RealmConfiguration config = new RealmConfiguration.Builder().build();
         Realm.setDefaultConfiguration(config);
 
-        /*
         Realm realm = Realm.getDefaultInstance();
-        final RealmResults realmResults = realm.where(Timeslot.class).findAll();
+        /*
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Srs srs = realm.createObject(Srs.class);
+                srs.setName("testsrs");
+                srs.setNote("selambennote");
+                srs.setSrs(0);
+            }
+        });*/
+
+        /*
+        final RealmResults realmResults = realm.where(Srs.class).findAll();
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {

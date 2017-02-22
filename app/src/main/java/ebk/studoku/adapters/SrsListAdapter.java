@@ -11,48 +11,69 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import ebk.studoku.R;
+import ebk.studoku.model.Srs;
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 /**
  * Created by E.Batuhan Kaynak on 12.2.2017.
  */
 
-public class SrsListAdapter extends SimpleCursorAdapter{
-    private LayoutInflater inflater;
-    private int layout;
+public class SrsListAdapter extends BaseAdapter{
 
-    public SrsListAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
-        super(context, layout, c, from, to, flags);
-        this.layout = layout;
-        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    private Context context;
+    private RealmResults<Srs> srsList;
+
+    public SrsListAdapter(Context context, int srs){
+        this.context = context;
+
+        Realm realm = Realm.getDefaultInstance();
+        if (srs == 0){
+            srsList = realm.where(Srs.class).equalTo("srs", 0).findAll();
+        }else{
+            srsList = realm.where(Srs.class).equalTo("srs", 0).not().findAll();
+        }
     }
 
     @Override
-    public View newView (Context context, Cursor cursor, ViewGroup parent) {
-        return inflater.inflate(layout, null);
+    public int getCount() {
+        return srsList.size();
     }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        super.bindView(view, context, cursor);
+    public Object getItem(int i) {
+        return srsList.get(i);
+    }
 
-        TextView listLevelTextView = (TextView) view.findViewById(R.id.listLevelTextView);
-        TextView listNameTextView = (TextView) view.findViewById(R.id.listNameTextView);
-        TextView listDateTextView = (TextView) view.findViewById(R.id.listDateTextView);
-        TextView listSrsTextView = (TextView) view.findViewById(R.id.listSrsTextView);
+    @Override
+    public long getItemId(int i) {
+        return i;
+    }
+
+    @Override
+    public View getView(int position, View listItem, ViewGroup viewGroup) {
+        LayoutInflater layoutInflater = LayoutInflater.from(context);
+        listItem = layoutInflater.inflate(R.layout.srs_listitem2, null);
+
+        TextView listLevelTextView = (TextView) listItem.findViewById(R.id.listLevelTextView);
+        TextView listNameTextView = (TextView) listItem.findViewById(R.id.listNameTextView);
+        TextView listDateTextView = (TextView) listItem.findViewById(R.id.listDateTextView);
+        TextView listSrsTextView = (TextView) listItem.findViewById(R.id.listSrsTextView);
 
         listNameTextView.setTypeface(listNameTextView.getTypeface(), Typeface.BOLD);
         //listDateTextView.setTypeface(listDateTextView.getTypeface(), Typeface.BOLD);
         listSrsTextView.setTypeface(listSrsTextView.getTypeface(), Typeface.BOLD);
 
-        String name = cursor.getString(cursor.getColumnIndex("NAME"));
-        String date = cursor.getString(cursor.getColumnIndex("NOTE"));
-        String srs = cursor.getString(cursor.getColumnIndex("SRS"));
-        int level = cursor.getInt(cursor.getColumnIndex("LEVEL"));
+        String name = srsList.get(position).getName();
+        String note = srsList.get(position).getNote();
+        String srs = String.valueOf(srsList.get(position).getSrs());
+        int level = srsList.get(position).getLevel();
 
         if(srs.equals("0")){
             srs = "Today";
@@ -60,21 +81,17 @@ public class SrsListAdapter extends SimpleCursorAdapter{
             srs = srs + " Days";
         }
 
-//        listLevelTextView.setBackground(getLevelDrawable(level, context));
+        //listLevelTextView.setBackground(getLevelDrawable(level, context));
         listNameTextView.setText(name);
-        listDateTextView.setText(date);
+        listDateTextView.setText(note);
         listSrsTextView.setText(srs);
 
         Drawable background = ContextCompat.getDrawable(context, R.drawable.custom_srsitem);
-        view.setBackground(background);
+        listItem.setBackground(background);
+
+        return listItem;
     }
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        return super.getView(position, convertView, parent);
-    }
-
-    // TODO: 17.2.2017 ONLY LEVEL 0 IS SHOWN
     private Drawable getLevelDrawable(int level, Context context) {
         Drawable levelBg;
         switch (level){

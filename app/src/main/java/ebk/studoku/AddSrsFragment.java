@@ -1,9 +1,9 @@
 package ebk.studoku;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,16 +17,14 @@ public class AddSrsFragment extends Fragment {
 
     private EditText notesEditView;
 
-    public interface OnDbUpdate {
-        public void OnDbUpdate(String notes);
+    private AddSrsListener addSrsListener;
+
+    public static interface AddSrsListener {
+        public void updateNote(String note);
     }
 
-    OnDbUpdate activityCom;
-
-    @Override
-    public void onAttach(Activity a) {
-        super.onAttach(a);
-        activityCom = (OnDbUpdate) a;
+    public void setListener(AddSrsListener addSrsListener){
+        this.addSrsListener = addSrsListener;
     }
 
     public AddSrsFragment() {
@@ -55,8 +53,8 @@ public class AddSrsFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        activityCom.OnDbUpdate(notesEditView.getText().toString());
+    public void onPause(){
+        super.onPause();
+        addSrsListener.updateNote(notesEditView.getText().toString());
     }
 }
